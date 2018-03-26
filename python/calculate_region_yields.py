@@ -76,12 +76,13 @@ def get_region(region_name = "") :
 
     # CRWt
     r = Region("cr_wt", "CR-wt")
-    r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>100) && (ht2ratio>0.6 && ht2ratio<0.8)"
+    r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>150) && (ht2ratio>0.6 && ht2ratio<0.8)"
     regions["cr_crwt"] = r
 
     # hhNonRes
     r = Region("sr_hhNonRes", "hhNonRes")
-    r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
+    r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (ht2ratio>0.8) && dRll<0.9" # && (mt2_bb>100)"#(dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
+    #r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
     regions["sr_hhNonRes"] = r
 
     if region_name not in regions :
