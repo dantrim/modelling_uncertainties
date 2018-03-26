@@ -53,6 +53,12 @@ def get_name(dsid = "") :
     names["410004"] = ["ttbar_PowhegHpp", "t#bar{t} Powheg+Hpp"]
     names["410189"] = ["ttbar_sherpa_dilep", "t#bar{t} Sherpa (dilep)"]
 
+    names["410015"] = ["wt_nom", "Wt nominal"]
+    names["410145"] = ["wt_PowhegHpp", "Wt Powheg+Hpp"]
+    names["410164"] = ["wt_aMCatNLOHpp", "Wt aMCatNLO+Hpp"]
+    names["410099"] = ["wt_radLo", "Wt radLo"]
+    names["410100"] = ["wt_radHi", "Wt radHi"]
+
     if dsid not in names :
         print "get_name    dsid %s not found" % dsid
         sys.exit()
@@ -67,6 +73,11 @@ def get_region(region_name = "") :
     r = Region("cr_crtt", "CR-tt")
     r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (dRll>1.5 && dRll<3.0) && (ht2ratio>0.4 && ht2ratio<0.6)"
     regions["cr_crtt"] = r
+
+    # CRWt
+    r = Region("cr_wt", "CR-wt")
+    r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>100) && (ht2ratio>0.6 && ht2ratio<0.8)"
+    regions["cr_crwt"] = r
 
     # hhNonRes
     r = Region("sr_hhNonRes", "hhNonRes")
@@ -89,6 +100,12 @@ def get_cross_section(dsid = "") :
     xsec["410003"] = 694.59*1.1975*0.543 
     xsec["410004"] = 696.32*1.1926*0.543 
     xsec["410189"] = 76.333*1.1484*1.0
+
+    xsec["410015"] = 3.5835*1.054*1.*1.
+    xsec["410164"] = 7.8714*0.9437*1.*1. 
+    xsec["410099"] = 34.917*1.027*1.*1. 
+    xsec["410100"] = 33.407*1.073*1.*1.
+    xsec["410145"] = 4.0000*0.9443*1.*1. 
 
     if dsid not in xsec :
         print "get_cross_section    dsid %s not found" % dsid
@@ -134,7 +151,7 @@ def get_yields(samples, region_name, weights) :
             err = r.Double(0.0)
             sample_yield = h.IntegralAndError(0,-1, err)
 
-            #print "process %s   dsid %s  region %s   weight %s  :  %.2f +/- %.2f" % (s.name, s.dsid, region_name, w_idx, sample_yield, err)
+            print "process %s   dsid %s  region %s   weight %s  :  %.2f +/- %.2f" % (s.name, s.dsid, region_name, w_idx, sample_yield, err)
             s.counts_dict[region.name][w_idx] = [sample_yield, err]
 
 def calculate_transfer_factors(samples, weights) :
@@ -245,6 +262,20 @@ def main() :
             sys.exit()
         s = Sample(input_file, get_name(dsid)[0], get_name(dsid)[1])
         samples.append(s)
+
+    found_nom = False
+    for s in samples :
+        if "nom" in s.name :
+            found_nom = True
+
+    # if we do not compare to nominal, just assume that the first sample is the one to compare to
+    # (this will be the one in the denominator of the TF calculation, so it can affect the TF
+    # uncertainty!!)
+    if not found_nom :
+        samples[0].nominal = True
+        for isample, sample in enumerate(samples) :
+            if isample == 0 : continue
+            sample.nominal = False
 
     print "Loaded %d samples" % len(samples)
 
