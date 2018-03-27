@@ -75,13 +75,13 @@ def get_region(region_name = "") :
     regions["cr_crtt"] = r
 
     # CRWt
-    r = Region("cr_wt", "CR-wt")
-    r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>150) && (ht2ratio>0.6 && ht2ratio<0.8)"
-    regions["cr_crwt"] = r
+    #r = Region("cr_wt", "CR-wt")
+    #r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>150) && (ht2ratio>0.6 && ht2ratio<0.8)"
+    #regions["cr_crwt"] = r
 
     # hhNonRes
     r = Region("sr_hhNonRes", "hhNonRes")
-    r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (ht2ratio>0.8) && dRll<0.9" # && (mt2_bb>100)"#(dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
+    r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (ht2ratio>0.8) && dRll<0.9"# && mt2_bb>100" # && (mt2_bb>100)"#(dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
     #r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
     regions["sr_hhNonRes"] = r
 
@@ -95,7 +95,8 @@ def get_cross_section(dsid = "") :
 
     xsec = {}
 
-    xsec["410009"] = 696.11*1.1949*0.543
+    xsec["410000"] = 696.11*1.1949*0.543
+    xsec["410009"] = 696.12*1.1949*0.1053*1.
     xsec["410001"] = 783.73*1.0613*0.543 
     xsec["410002"] = 783.73*1.0613*0.543 
     xsec["410003"] = 694.59*1.1975*0.543 
@@ -146,13 +147,13 @@ def get_yields(samples, region_name, weights) :
             lumi = 35.0 * 1000.
 
             h = r.TH1F("h_%s_%s_%s" % (s.name, region_name, w_idx), "", 10, 0, 10)
-            cut_string = "(mcEventWeights[%s] * %f * %f / %f) * (%s)" % (w_idx, xsec, lumi, sumw, region.tcut)
+            cut_string = "((mcEventWeights[%s] * %f * %f / %f)) * (%s)" % (w_idx, xsec, lumi, sumw, region.tcut)
             s.tree.Draw("nLeptons>>%s" % h.GetName(), cut_string, "goff")
 
             err = r.Double(0.0)
             sample_yield = h.IntegralAndError(0,-1, err)
 
-            print "process %s   dsid %s  region %s   weight %s  :  %.2f +/- %.2f" % (s.name, s.dsid, region_name, w_idx, sample_yield, err)
+            print "process %s   dsid %s  region %s   weight %s     xsec %s   sumw %s :  %.2f +/- %.2f" % (s.name, s.dsid, region_name, w_idx, str(xsec), str(sumw), sample_yield, err)
             s.counts_dict[region.name][w_idx] = [sample_yield, err]
 
 def calculate_transfer_factors(samples, weights) :
