@@ -3,11 +3,15 @@
 import ROOT as r
 r.PyConfig.IgnoreCommandLineOptions = True
 r.gROOT.SetBatch(True)
+r.gStyle.SetOptStat(False)
 
 from optparse import OptionParser
 import sys
 import glob
 from math import sqrt
+
+r.TH1F.__init__._creates = False
+r.TCanvas.__init__._creates = False
 
 class Sample :
     def __init__(self, input_file = "", name = "", displayname = "") :
@@ -47,6 +51,7 @@ def get_name(dsid = "") :
 
     names = {}
     names["410009"] = ["ttbar_nom", "t#bar{t} nominal"]
+    names["410503"] = ["ttbar_PowHegPythia8", "t#bar{t} PP8"]
     names["410001"] = ["ttbar_radHi", "t#bar{t} radHi"]
     names["410002"] = ["ttbar_radLo", "t#bar{t} radLo"]
     names["410003"] = ["ttbar_aMCatNLOHpp", "t#bar{t} aMCatNLO+Hpp"]
@@ -75,15 +80,20 @@ def get_region(region_name = "") :
     regions["cr_crtt"] = r
 
     # CRWt
-    #r = Region("cr_wt", "CR-wt")
-    #r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>150) && (ht2ratio>0.6 && ht2ratio<0.8)"
-    #regions["cr_crwt"] = r
+    r = Region("cr_wt", "CR-wt")
+    r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>150) && (ht2ratio>0.6 && ht2ratio<0.8)"
+    regions["cr_crwt"] = r
 
     # hhNonRes
     r = Region("sr_hhNonRes", "hhNonRes")
     r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (ht2ratio>0.8) && dRll<0.9"# && mt2_bb>100" # && (mt2_bb>100)"#(dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
     #r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
     regions["sr_hhNonRes"] = r
+
+    # plot region
+    r = Region("plot", "WWbb Loose")
+    r.tcut = "nBJets==2"
+    regions["plot"] = r
 
     if region_name not in regions :
         print "get_region    region %s not found" % region_name
@@ -97,6 +107,7 @@ def get_cross_section(dsid = "") :
 
     xsec["410000"] = 696.11*1.1949*0.543
     xsec["410009"] = 696.12*1.1949*0.1053*1.
+    xsec["410503"] = 76.932*1.139*1.*1.
     xsec["410001"] = 783.73*1.0613*0.543 
     xsec["410002"] = 783.73*1.0613*0.543 
     xsec["410003"] = 694.59*1.1975*0.543 
@@ -119,6 +130,224 @@ def get_sumw(sample, weight_index = "") :
 
     rfile = r.TFile.Open(sample.file)
     return rfile.Get("CutflowWeighted").GetBinContent( int(weight_index) + 1 )
+
+def get_variables() :
+
+    v = {}
+
+    #v["l0_pt"] =        [5, 0, 300]
+    #v["l1_pt"] =        [5, 0, 200]
+    #v["l0_eta"] =       [0.1, -2.5, 2.5]
+    #v["l1_eta"] =       [0.1, -2.5, 2.5]
+    #v["j0_pt"] =        [5, 0, 500]
+    #v["j1_pt"] =        [5, 0, 500]
+    #v["sj0_pt"] =       [5, 0, 500]
+    #v["sj1_pt"] =       [5, 0, 500]
+    #v["bj0_pt"] =       [5, 0, 500]
+    #v["bj1_pt"] =       [5, 0, 500]
+    #v["j0_eta"] =       [0.1, -3.0, 3.0]
+    #v["j1_eta"] =       [0.1, -3.0, 3.0]
+    #v["sj0_eta"] =      [0.1, -3.0, 3.0]
+    #v["sj1_eta"] =      [0.1, -3.0, 3.0]
+    #v["bj0_eta"] =      [0.1, -3.0, 3.0]
+    #v["bj1_eta"] =      [0.1, -3.0, 3.0]
+    #v["n_jets"] =       [1, 0, 8]
+    #v["n_sjets"] =      [1,0,8]
+    #v["n_bjets"] =      [1,0,8]
+    #v["mll"] =          [5, 0, 500]
+    #v["ptll"] =         [5, 0, 400]
+    #v["dRll"] =         [0.1, 0, 5]
+    #v["dphi_ll"] =      [0.1, -3.2, 3.2]
+    #v["metphi"] =       [0.1, -3.2, 3.2]
+    #v["met"] =          [5, 0, 400]
+    #v["met_sumet"] =    [5, 0, 500]
+    #v["dr_llmet"] =     [0.1, 0, 6]
+    #v["metptll"] =      [5, 0, 500]
+    v["mbb"] =          [10, 0, 800]
+    #v["dr_bb"] =        [0.1, 0, 6]
+    #v["dphi_bb"] =      [0.1, -3.2, 3.2]
+    #v["ptbb"] =         [5, 0, 400]
+    #v["dr_llbb"] =      [0.1, 0, 6]
+    #v["dphi_llbb"] =    [0.1, -3.2, 3.2]
+    #v["dphi_l0b0"] =    [0.1, -3.2, 3.2]
+    #v["dr_l0b0"] =      [0.1, 0, 6]
+    #v["dphi_l0b1"] =    [0.1, 0, 6]
+    #v["dr_l0b1"] =      [0.1, 0, 6]
+    #v["dr_bbmet"] =     [0.1, 0, 6]
+    #v["dphi_bbmet"] =   [0.1, -3.2, 3.2]
+    #v["pt_bbmet"] =     [5, 0, 500]
+    #v["dphi_llmet_bb"] =[0.1, -3.2,3.2]
+    #v["dr_llmet_bb"] =  [0.1, 0, 6]
+    #v["ht2"] =          [5, 0, 600]
+    #v["ht2ratio"] =     [0.05, 0, 1]
+    v["mt2_llbb"] =     [5,0,800]
+    #v["mt2_bb"] =       [5, 0, 300]
+    #v["truth_wpt"] =    [5, 0, 300]
+    #v["truth_wmass"] =  [2, 20, 130]
+
+    return v
+
+#def make_plot(samples, region_name, weights, var_name, var_bounds, do_ratio) :
+def make_plot(samples, region_name, weights, do_ratio) :
+
+    vardict = get_variables()
+    for var_name, var_bounds in vardict.iteritems() :
+
+        do_log = True
+
+        c = r.TCanvas("c_%s_%s" % (region_name, var_name), "", 500, 500)
+        c.SetFillColor(0)
+        c.cd()
+        if do_log :
+            c.SetLogy(True)
+
+        upper = None
+        lower = None
+
+        if do_ratio :
+            upper = r.TPad("upper", "", 0, 0.2, 1, 1)
+            lower = r.TPad("lower", "", 0, 0, 1, 0.3)
+
+            if do_log :
+                upper.SetLogy(True)
+            upper.SetBottomMargin(0.15)
+            lower.SetBottomMargin(0.3)
+            upper.Draw()
+            lower.Draw()
+
+
+        # legend
+        leg = r.TLegend(0.55, 0.7, 0.9, 0.85)
+        leg.SetBorderSize(0)
+        leg.SetFillColor(0)
+
+        
+        region = get_region(region_name) 
+
+        histos = []
+        rhistos = []
+        colors = [r.kBlack, r.kRed-7, r.kBlue-7, r.kGreen-9, r.kMagenta-7, r.kCyan-7]
+
+        x_high = var_bounds[2]
+        x_low = var_bounds[1]
+        bin_width = var_bounds[0]
+        n_bins = x_high - x_low
+        n_bins = n_bins / bin_width
+        n_bins = int(n_bins)
+
+        maxy = -1
+
+        for isample, sample in enumerate(samples) :
+
+            for w_idx_str in weights :
+                w_idx = int(w_idx_str)
+
+                sumw = get_sumw(sample, w_idx_str)
+                xsec = get_cross_section(sample.dsid)
+                lumi = 35.0 * 1000.
+
+                h = r.TH1F("h_%s_%s_%s_%s" % (var_name, isample, w_idx_str, region_name), ";%s;Entries / %s" % (var_name, str(var_bounds[0])), n_bins, x_low, x_high)
+                h.Sumw2()
+                h.SetLineColor(colors[isample + w_idx])
+                h.SetMarkerStyle(20)
+                h.SetMarkerColor(colors[isample + w_idx])
+                h.SetLineWidth(2)
+
+                hr = r.TH1F("hr_%s_%s_%s_%s" % (var_name, isample, w_idx_str, region_name), ";%s;Entries / %s" % (var_name, str(var_bounds[0])), n_bins, x_low, x_high)
+                hr.Sumw2()
+                hr.SetLineColor(colors[isample + w_idx])
+                hr.SetMarkerStyle(20)
+                hr.SetMarkerColor(colors[isample + w_idx])
+                hr.SetLineWidth(2)
+
+                cut_string = "((mcEventWeights[%s] * %f * %f / %f)) * (%s)" % (w_idx_str, xsec, lumi, sumw, region.tcut)
+                sample.tree.Draw("%s>>%s" % (var_name, h.GetName()), cut_string, "goff")
+                sample.tree.Draw("%s>>%s" % (var_name, hr.GetName()), cut_string, "goff")
+                
+                err = r.Double(0.0)
+                sample_yield = h.IntegralAndError(0,-1,err)
+
+                h.Scale(1/h.Integral())
+                hr.Scale(1/hr.Integral())
+
+                if h.GetMaximum() > maxy : maxy = h.GetMaximum()
+                if hr.GetMaximum() > maxy : maxy = hr.GetMaximum()
+
+                histos.append(h)
+                rhistos.append(hr)
+
+        c.cd()
+
+        if do_ratio :
+            upper.cd()
+
+        maxy = 1.2 * maxy
+        if do_log :
+            maxy = 100 * maxy
+
+        for ih, h in enumerate(histos) :
+            h.SetMaximum(maxy)
+            cmd = "hist"
+            if ih > 0 : cmd = "hist same"
+            h.Draw(cmd)
+            leg.AddEntry(h, samples[ih].name, "l")
+            c.Update()
+
+        leg.Draw()
+        c.Update()
+
+        if do_ratio :
+
+            lower.cd()
+
+
+            for ih, hst in enumerate(rhistos) :
+                if ih == 0 :
+                    continue
+#                hnom = histos[0].Clone("h_den_%s_%d" % ( histos[0].GetName(), ih ))
+#                hnom = r.TH1F("num_%s" % histos[0].GetName(), ";X;Y", n_bins, x_low, x_high)
+                hnom = rhistos[0]
+                hr = rhistos[ih]
+#                hr = histos[ih].Clone("h_num_%s_XX" % histos[ih].GetName())
+                hr.Divide(hnom)
+                hr.SetMaximum(3)
+                hr.SetMinimum(0)
+                cmd = "hist"
+                if ih > 0 :
+                    cmd += " same"
+                hr.Draw(cmd)
+                c.Update()
+
+            line = r.TLine(x_low, 1.0, x_high, 1.0)
+            line.SetLineStyle(2)
+            line.SetLineWidth(2)
+            line.SetLineColor(r.kRed)
+            line.Draw()
+            c.Update()
+
+        #for h in histos :
+        #    h.Reset()
+
+        # save
+        out_dir = "./plots/"
+        out_dir += "wwbb_truth_plot_%s.eps" % var_name
+        c.SaveAs(out_dir)
+
+
+            
+
+        
+
+def make_plots(samples, region_name, weights, do_ratio) :
+
+    ncount = 0
+    make_plot(samples, region_name, weights, do_ratio)
+#    for var_name, var_bounds in get_variables().iteritems() :
+#        if ncount > 5 : break
+#
+#        make_plot(samples, region_name, weights, var_name, var_bounds, do_ratio)
+#        ncount+=1
+        
 
 def get_yields(samples, region_name, weights) :
 
@@ -219,6 +448,8 @@ def main() :
     parser.add_option("-d", "--dsid",   default = "",  help = "input dsid(s) (comma separated list)")
     parser.add_option("-r", "--region", default = "",  help = "region to get yields for (can be comma separated list)")
     parser.add_option("-w", "--weights", default = "0", help = "provide weights to use (comma separated) [default: nominal]")
+    parser.add_option("--plot", default = False, action = "store_true", help = "make plots instead")
+    parser.add_option('--plot-ratio', default = False, action = "store_true", help = "plot ration in plots")
     (options, args) = parser.parse_args()
 
     if options.indir == "" :
@@ -285,7 +516,14 @@ def main() :
         print 50 * '-'
         print "getting yields for %s" % region_name
 
-        get_yields(samples, region_name, weights)
+
+        if options.plot :
+            if len(samples)>1 and len(weights)>1 :
+                print "can't plot multiple weights with multiple samples"
+                sys.exit()
+            make_plots(samples, region_name, weights, options.plot_ratio)
+        else :
+            get_yields(samples, region_name, weights)
 
     if len(regions)==2 :
         calculate_transfer_factors(samples, weights)
