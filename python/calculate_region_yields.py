@@ -80,13 +80,17 @@ def get_region(region_name = "") :
     regions["cr_crtt"] = r
 
     # CRWt
-    r = Region("cr_wt", "CR-wt")
-    r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>150) && (ht2ratio>0.6 && ht2ratio<0.8)"
+    r = Region("cr_crwt", "CR-wt")
+    #r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>150) && ht2ratio<0.8"
+    #r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>80) && (ht2ratio>0.6 && ht2ratio<0.8)"
+    r.tcut = "nBJets==2 && mbb>140 && (mt2_bb>100) && (ht2ratio>0.4 && ht2ratio<0.8) && (abs(truth_wmass - 80.9) < 20)"
     regions["cr_crwt"] = r
 
     # hhNonRes
     r = Region("sr_hhNonRes", "hhNonRes")
-    r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (ht2ratio>0.8) && dRll<0.9"# && mt2_bb>100" # && (mt2_bb>100)"#(dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
+    r.tcut = "nBJets==2 && mbb<140 &&  (ht2ratio>0.8) && dRll<1.2 && (abs(truth_wmass - 80.9) < 20)"# && mt2_bb>100" # && (mt2_bb>100)"#(dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
+
+    #r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (ht2ratio>0.8) && dRll<0.9"# && mt2_bb>100" # && (mt2_bb>100)"#(dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
     #r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
     regions["sr_hhNonRes"] = r
 
@@ -135,55 +139,55 @@ def get_variables() :
 
     v = {}
 
-    #v["l0_pt"] =        [5, 0, 300]
-    #v["l1_pt"] =        [5, 0, 200]
-    #v["l0_eta"] =       [0.1, -2.5, 2.5]
-    #v["l1_eta"] =       [0.1, -2.5, 2.5]
-    #v["j0_pt"] =        [5, 0, 500]
-    #v["j1_pt"] =        [5, 0, 500]
-    #v["sj0_pt"] =       [5, 0, 500]
-    #v["sj1_pt"] =       [5, 0, 500]
-    #v["bj0_pt"] =       [5, 0, 500]
-    #v["bj1_pt"] =       [5, 0, 500]
-    #v["j0_eta"] =       [0.1, -3.0, 3.0]
-    #v["j1_eta"] =       [0.1, -3.0, 3.0]
-    #v["sj0_eta"] =      [0.1, -3.0, 3.0]
-    #v["sj1_eta"] =      [0.1, -3.0, 3.0]
-    #v["bj0_eta"] =      [0.1, -3.0, 3.0]
-    #v["bj1_eta"] =      [0.1, -3.0, 3.0]
-    #v["n_jets"] =       [1, 0, 8]
-    #v["n_sjets"] =      [1,0,8]
-    #v["n_bjets"] =      [1,0,8]
-    #v["mll"] =          [5, 0, 500]
-    #v["ptll"] =         [5, 0, 400]
-    #v["dRll"] =         [0.1, 0, 5]
-    #v["dphi_ll"] =      [0.1, -3.2, 3.2]
-    #v["metphi"] =       [0.1, -3.2, 3.2]
-    #v["met"] =          [5, 0, 400]
-    #v["met_sumet"] =    [5, 0, 500]
-    #v["dr_llmet"] =     [0.1, 0, 6]
-    #v["metptll"] =      [5, 0, 500]
+    v["l0_pt"] =        [5, 0, 300]
+    v["l1_pt"] =        [5, 0, 200]
+    v["l0_eta"] =       [0.1, -2.5, 2.5]
+    v["l1_eta"] =       [0.1, -2.5, 2.5]
+    v["j0_pt"] =        [5, 0, 500]
+    v["j1_pt"] =        [5, 0, 500]
+    v["sj0_pt"] =       [5, 0, 500]
+    v["sj1_pt"] =       [5, 0, 500]
+    v["bj0_pt"] =       [5, 0, 500]
+    v["bj1_pt"] =       [5, 0, 500]
+    v["j0_eta"] =       [0.1, -3.0, 3.0]
+    v["j1_eta"] =       [0.1, -3.0, 3.0]
+    v["sj0_eta"] =      [0.1, -3.0, 3.0]
+    v["sj1_eta"] =      [0.1, -3.0, 3.0]
+    v["bj0_eta"] =      [0.1, -3.0, 3.0]
+    v["bj1_eta"] =      [0.1, -3.0, 3.0]
+    v["n_jets"] =       [1, 0, 8]
+    v["n_sjets"] =      [1,0,8]
+    v["n_bjets"] =      [1,0,8]
+    v["mll"] =          [5, 0, 500]
+    v["ptll"] =         [5, 0, 400]
+    v["dRll"] =         [0.1, 0, 5]
+    v["dphi_ll"] =      [0.1, -3.2, 3.2]
+    v["metphi"] =       [0.1, -3.2, 3.2]
+    v["met"] =          [5, 0, 400]
+    v["met_sumet"] =    [5, 0, 500]
+    v["dr_llmet"] =     [0.1, 0, 6]
+    v["metptll"] =      [5, 0, 500]
     v["mbb"] =          [10, 0, 800]
-    #v["dr_bb"] =        [0.1, 0, 6]
-    #v["dphi_bb"] =      [0.1, -3.2, 3.2]
-    #v["ptbb"] =         [5, 0, 400]
-    #v["dr_llbb"] =      [0.1, 0, 6]
-    #v["dphi_llbb"] =    [0.1, -3.2, 3.2]
-    #v["dphi_l0b0"] =    [0.1, -3.2, 3.2]
-    #v["dr_l0b0"] =      [0.1, 0, 6]
-    #v["dphi_l0b1"] =    [0.1, 0, 6]
-    #v["dr_l0b1"] =      [0.1, 0, 6]
-    #v["dr_bbmet"] =     [0.1, 0, 6]
-    #v["dphi_bbmet"] =   [0.1, -3.2, 3.2]
-    #v["pt_bbmet"] =     [5, 0, 500]
-    #v["dphi_llmet_bb"] =[0.1, -3.2,3.2]
-    #v["dr_llmet_bb"] =  [0.1, 0, 6]
-    #v["ht2"] =          [5, 0, 600]
-    #v["ht2ratio"] =     [0.05, 0, 1]
+    v["dr_bb"] =        [0.1, 0, 6]
+    v["dphi_bb"] =      [0.1, -3.2, 3.2]
+    v["ptbb"] =         [5, 0, 400]
+    v["dr_llbb"] =      [0.1, 0, 6]
+    v["dphi_llbb"] =    [0.1, -3.2, 3.2]
+    v["dphi_l0b0"] =    [0.1, -3.2, 3.2]
+    v["dr_l0b0"] =      [0.1, 0, 6]
+    v["dphi_l0b1"] =    [0.1, 0, 6]
+    v["dr_l0b1"] =      [0.1, 0, 6]
+    v["dr_bbmet"] =     [0.1, 0, 6]
+    v["dphi_bbmet"] =   [0.1, -3.2, 3.2]
+    v["pt_bbmet"] =     [5, 0, 500]
+    v["dphi_llmet_bb"] =[0.1, -3.2,3.2]
+    v["dr_llmet_bb"] =  [0.1, 0, 6]
+    v["ht2"] =          [5, 0, 600]
+    v["ht2ratio"] =     [0.05, 0, 1]
     v["mt2_llbb"] =     [5,0,800]
-    #v["mt2_bb"] =       [5, 0, 300]
-    #v["truth_wpt"] =    [5, 0, 300]
-    #v["truth_wmass"] =  [2, 20, 130]
+    v["mt2_bb"] =       [5, 0, 300]
+    v["truth_wpt"] =    [5, 0, 300]
+    v["truth_wmass"] =  [2, 20, 130]
 
     return v
 
@@ -226,7 +230,7 @@ def make_plot(samples, region_name, weights, do_ratio) :
 
         histos = []
         rhistos = []
-        colors = [r.kBlack, r.kRed-7, r.kBlue-7, r.kGreen-9, r.kMagenta-7, r.kCyan-7]
+        colors = [r.kBlack, r.kRed-7, r.kBlue-7, r.kGreen-9, r.kMagenta-7, r.kCyan-7, r.kAzure+9]
 
         x_high = var_bounds[2]
         x_low = var_bounds[1]
@@ -261,14 +265,14 @@ def make_plot(samples, region_name, weights, do_ratio) :
                 hr.SetLineWidth(2)
 
                 cut_string = "((mcEventWeights[%s] * %f * %f / %f)) * (%s)" % (w_idx_str, xsec, lumi, sumw, region.tcut)
-                sample.tree.Draw("%s>>%s" % (var_name, h.GetName()), cut_string, "goff")
-                sample.tree.Draw("%s>>%s" % (var_name, hr.GetName()), cut_string, "goff")
+                sample.tree.Draw("%s>>+%s" % (var_name, h.GetName()), cut_string, "goff")
+                sample.tree.Draw("%s>>+%s" % (var_name, hr.GetName()), cut_string, "goff")
                 
                 err = r.Double(0.0)
                 sample_yield = h.IntegralAndError(0,-1,err)
 
-                h.Scale(1/h.Integral())
-                hr.Scale(1/hr.Integral())
+                #h.Scale(1/h.Integral())
+                #hr.Scale(1/hr.Integral())
 
                 if h.GetMaximum() > maxy : maxy = h.GetMaximum()
                 if hr.GetMaximum() > maxy : maxy = hr.GetMaximum()
@@ -376,7 +380,9 @@ def get_yields(samples, region_name, weights) :
             lumi = 35.0 * 1000.
 
             h = r.TH1F("h_%s_%s_%s" % (s.name, region_name, w_idx), "", 10, 0, 10)
+            #print " GETTING RAW YIELDS!!"
             cut_string = "((mcEventWeights[%s] * %f * %f / %f)) * (%s)" % (w_idx, xsec, lumi, sumw, region.tcut)
+            #cut_string = "(%s)" % (region.tcut)
             s.tree.Draw("nLeptons>>%s" % h.GetName(), cut_string, "goff")
 
             err = r.Double(0.0)
