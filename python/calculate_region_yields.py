@@ -75,20 +75,20 @@ def get_region(region_name = "") :
     regions = {}
 
     # CRttbar 
-    r = Region("cr_crtt", "CR-tt")
-    r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (dRll>1.5 && dRll<3.0) && (ht2ratio>0.4 && ht2ratio<0.6)"
-    regions["cr_crtt"] = r
+    #r = Region("cr_crtt", "CR-tt")
+    #r.tcut = "n_bjets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (dRll>1.5 && dRll<3.0) && (ht2ratio>0.4 && ht2ratio<0.6)"
+    #regions["cr_crtt"] = r
 
     # CRWt
     r = Region("cr_crwt", "CR-wt")
     #r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>150) && ht2ratio<0.8"
     #r.tcut = "nBJets==2 && (mbb>140) && (mt2_bb>80) && (ht2ratio>0.6 && ht2ratio<0.8)"
-    r.tcut = "nBJets==2 && mbb>140 && (mt2_bb>100) && (ht2ratio>0.4 && ht2ratio<0.8) && (abs(truth_wmass - 80.9) < 20)"
+    r.tcut = "n_bjets==2 && mbb>140 && mt2_bb>80 && ht2ratio>0.4 && ht2ratio<0.8"# && abs(truth_wmass[0]-80.9)<20 && abs(truth_wmass[1]-80.9)<20"
     regions["cr_crwt"] = r
 
     # hhNonRes
     r = Region("sr_hhNonRes", "hhNonRes")
-    r.tcut = "nBJets==2 && mbb<140 &&  (ht2ratio>0.8) && dRll<1.2 && (abs(truth_wmass - 80.9) < 20)"# && mt2_bb>100" # && (mt2_bb>100)"#(dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
+    r.tcut = "n_bjets==2 && mbb<140 && mt2_bb>80 && ht2ratio>0.8 && dRll<1.5"# &&  abs(truth_wmass[0]-80.9)<20 && abs(truth_wmass[1]-80.9)<20"# && mt2_bb>100" # && (mt2_bb>100)"#(dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
 
     #r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (ht2ratio>0.8) && dRll<0.9"# && mt2_bb>100" # && (mt2_bb>100)"#(dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
     #r.tcut = "nBJets==2 && (mbb>100 && mbb<140) && (mt2_llbb>100 && mt2_llbb<140) && (dRll<0.9) && (ht2ratio>0.9)"# && (mt2_bb>150)"
@@ -380,9 +380,10 @@ def get_yields(samples, region_name, weights) :
             lumi = 35.0 * 1000.
 
             h = r.TH1F("h_%s_%s_%s" % (s.name, region_name, w_idx), "", 10, 0, 10)
-            #print " GETTING RAW YIELDS!!"
-            cut_string = "((mcEventWeights[%s] * %f * %f / %f)) * (%s)" % (w_idx, xsec, lumi, sumw, region.tcut)
+#            print " GETTING RAW YIELDS!!"
+            cut_string = "(( (mcEventWeights[%s] * %f * %f) / %f) * (%s))" % (w_idx, xsec, lumi, sumw, region.tcut)
             #cut_string = "(%s)" % (region.tcut)
+#            print "CUT STRING = %s" % cut_string
             s.tree.Draw("nLeptons>>%s" % h.GetName(), cut_string, "goff")
 
             err = r.Double(0.0)
